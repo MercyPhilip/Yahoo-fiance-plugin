@@ -1,8 +1,4 @@
 <?php
-/**
- * @package ASX
- * @version 0.1
- */
 /*
 Plugin Name: ASX_Quote
 Plugin URI: http://wordpress.org/plugins/
@@ -17,31 +13,37 @@ function asx_submenu(){
 	add_options_page('ASX Setting', 'ASX Setting', 'administrator', 'asx-setting', 'asx_options');
 }
 function asx_options() {
+	if(isset($_POST['update_asx_interval'])){
+		if($_POST['update_asx_interval']){
+			if(get_option('asx_interval') !== $_POST['asx_interval']){
+				update_option('asx_interval', $_POST['asx_interval']);
 
-	if($_POST['update_asx_interval']){
-		if(get_option('asx_interval') !== $_POST['asx_interval']){
-			update_option('asx_interval', $_POST['asx_interval']);
-
-		}?>
-		<div id="message" style="background-color: green; color: #ffffff;">Update Successfully!</div>
-
-	<?php
-	}
-	if($_POST['refresh_asx_data']){
-		get_asx_data();
-		?>
-		<div id="message" style="background-color: green; color: #ffffff;">Refresh Successfully!</div>
-
-		<?php
-	}
-	if($_POST['clear_asx_data']){
-		delete_option('asx_data');
-		?>
-		<div id="message" style="background-color: green; color: #ffffff;">Clear Successfully!</div>
+			}?>
+			<div id="message" style="background-color: green; color: #ffffff;">Update Successfully!</div>
 
 	<?php
-	}
+		}
+	}	
+	
+	if(isset($_POST['refresh_asx_data'])){
+		if($_POST['refresh_asx_data']){
+			get_asx_data();
 	?>
+			<div id="message" style="background-color: green; color: #ffffff;">Refresh Successfully!</div>
+
+	<?php
+		}
+	}
+	if(isset($_POST['clear_asx_data'])){
+		if($_POST['clear_asx_data']){
+			delete_option('asx_data');
+	?>
+			<div id="message" style="background-color: green; color: #ffffff;">Clear Successfully!</div>
+
+	<?php
+		}
+	}
+?>
 
 	<div class="wrap">
 		<h2>ASX Setting</h2>
@@ -68,7 +70,7 @@ function asx_options() {
 		</form>
 	</div>
 
-<?php	
+<?php
 }
 
 	function get_asx_data(){
@@ -122,5 +124,12 @@ function asx_options() {
 	}
 
 add_action('wp_enqueue_scripts', 'add_asx_style' );
+
+function update_asx_deactivation(){
+	wp_clear_scheduled_hook('asx_get_data_by_timely');
+}
+
+register_deactivation_hook(basename(__FILE__),'update_asx_deactivation');
+
 require( dirname( __FILE__ ) . '/widget.php' );
 ?>

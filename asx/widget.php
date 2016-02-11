@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class Asx_Widget extends WP_Widget {
 		
 	/**
@@ -29,6 +29,7 @@ class Asx_Widget extends WP_Widget {
 				if ( ! empty( $instance['title'] ) ) {
 					echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ). $args['after_title'];
 				}
+				$result = "";
 				$result .= '<div class="asx-summary"><div class="quote-summary"><div class="hd"><div class="title"><h3 style="display: inline-block">';
 				$result .= $asx_data->symbol;
 				$result .= "</h3>";
@@ -109,7 +110,7 @@ class Asx_Widget extends WP_Widget {
     		$asx_code = '';
     	}    
 
-		?>
+?>
 		<p>
 		<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
 		<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>">
@@ -118,7 +119,7 @@ class Asx_Widget extends WP_Widget {
 		<label for="<?php echo $this->get_field_id( 'asx_code' ); ?>"><?php _e( 'ASX Code:' ); ?></label> 
 		<input class="widefat" id="<?php echo $this->get_field_id( 'asx_code' ); ?>" name="<?php echo $this->get_field_name( 'asx_code' ); ?>" type="text" value="<?php echo esc_attr( $asx_code ); ?>">
 		</p>
-		<?php 
+<?php
 	}
 
 
