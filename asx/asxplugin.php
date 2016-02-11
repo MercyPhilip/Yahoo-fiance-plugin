@@ -13,58 +13,10 @@ Author URI: http://wordpress.org/plugins/
 */
 
 add_action('admin_menu','asx_submenu');
-function asx_submenu() {
-	add_options_page( 'ASX Setting', 'ASX Setting', 'administrator','asx-setting','asx_options');
-	
-//	add_action('admin_init', 'register_asx_setting');
+function asx_submenu(){
+	add_options_page('ASX Setting', 'ASX Setting', 'administrator', 'asx-setting', 'asx_options');
 }
-
-/*function register_asx_setting() {
-	
-	register_setting( 'asx-options', 'time-frame');
-	register_setting( 'asx-options', 'asx-code');
-
-}*/
-
 function asx_options() {
-    /*$asx_time_frame = esc_attr(get_option('asx_time_frame'));
-    $asx_code = esc_attr(get_option('asx_code'));*/
-/*    $settings = get_option('widget_asx_widget');
-	
-	foreach($settings as $number => $setting) {
-		
-		if (is_null($setting)){
-			continue;
-		} 
-		
-		$title = $setting['title'];
-		$asx_time_frame = $setting['asx_time_frame'];
-		$asx_code = $setting['asx_code'];
-		$num = $number;		
-		break;
-	
-	}
-
-
-	if($_POST['update_asx_option']){
-		
-		if ($asx_code !== $_POST['asx_code'] || $asx_time_frame !== $_POST['asx_time_frame'] || $title !== $_POST['asx_title']){
-
-			$setting['title'] = $_POST['asx_title'];
-			$setting['asx_time_frame'] = $_POST['asx_time_frame'];
-			$setting['asx_code'] = $_POST['asx_code'];
-			$settings[$num] = $setting;
-
-			update_option('widget_asx_widget', $settings);*/?><!--
-			
-			<div id="message" style="background-color: green; color: #ffffff;">Update Successfully!</div>
-	--><?php	/*
-		}
-		$settings = get_option('widget_asx_widget');
-		$title = $settings[$num]['title'];
-		$asx_time_frame = $settings[$num]['asx_time_frame'];
-		$asx_code = $settings[$num]['asx_code'];
-	}*/
 
 	if($_POST['update_asx_interval']){
 		if(get_option('asx_interval') !== $_POST['asx_interval']){
@@ -89,8 +41,8 @@ function asx_options() {
 
 	<?php
 	}
-
 	?>
+
 	<div class="wrap">
 		<h2>ASX Setting</h2>
 	 
@@ -152,102 +104,18 @@ function asx_options() {
 	
 	function asx_set_recurrency(){
 		return array(
-			'timely' => array('interval' => 180, 'display' => 'Timely'),
+			'timely' => array('interval' => get_option('asx_interval'), 'display' => 'Timely'),
 		);
 	}
 	
 	add_filter('cron_schedules', 'asx_set_recurrency');
 	
-	if(!wp_next_scheduled('asx_get_data_by_three')){
-		wp_schedule_event(time(),'timely','asx_get_data_by_three');
+	if(!wp_next_scheduled('asx_get_data_by_timely')){
+		wp_schedule_event(time(),'timely','asx_get_data_by_timely');
 	}
 
-/*	function layout($title, $data){
-		$result = "";
-		$result .= "<h1>";
-		$result .= $title;
-		$result .= "</h1>";
-		$result .= '<div class="asx-summary"><div class="quote-summary"><div class="hd"><div class="title"><h2>';
-		$result .= $data->symbol;
-		$result .= "</h2>";
+	add_action('asx_get_data_by_timely','get_asx_data');
 
-		$result .= "<span><span>-</span>";
-		$result .= $data->StockExchange;
-		$result .='</span></div></div><div class="asx-quote"><div><span class="ticker">';
-		$result .=$data->LastTradePriceOnly;
-		$result .='</span><span class=“change">';
-		$result .=$data->Change;
-		$result .='</span><span class=“change-percent">';
-		$result .=$data->ChangeinPercent;
-		$result .='</span><span class=“trade-time">';
-		$result .=$data->LastTradeTime;
-		$result .= "</span></div></div></div></div>";
-		echo $result;
-	}
-	add_action('asx_get_data_by_three','get_asx_data');
-
-	function asx_shortcode_handler($atts, $content='') {
-		extract( shortcode_atts( array(
-				'asx_code'  => ''
-		), $atts ) );
-
-		$settings= get_option('widget_asx_widget');
-
-		if(isset($settings)) {
-			foreach ($settings as $number => $setting) {
-
-				if (isset($asx_code)) {
-					if ($asx_code == $setting['asx_code']) {
-						$flag = 1;
-						break;
-					} else {
-						$num_s = $number;
-						continue;
-					}
-				}
-			}
-		}
-
-		$data = get_option('asx_data');
-
-		if($flag !== 1){
-			$setting['asx_code'] = $asx_code;
-			$setting['title'] = $content;
-			$num_s = $num_s + 1;
-			$settings[$num_s] = $setting;
-			update_option('widget_asx_widget', $settings);
-
-			$count = count($data);
-			$count = $count + 1;
-
-			$yql_base_url = "http://query.yahooapis.com/v1/public/yql";
-			$yql_query = "select * from yahoo.finance.quotes where symbol = '$asx_code'";
-			$yql_query_url = $yql_base_url . "?q=" . urlencode($yql_query) . "&format=json&env=http%3A%2F%2Fdatatables.org%2Falltables.env&callback=";
-
-			$session = curl_init($yql_query_url);
-
-			curl_setopt($session, CURLOPT_RETURNTRANSFER,true);
-			$json = curl_exec($session);
-
-			$dataObj =  json_decode($json);
-
-			if(!is_null($dataObj->query->results)){
-				$data[$count] = $dataObj->query->results->quote;
-				update_option('asx_data', $data);
-			}
-			layout($content, $data[$count]);
-		}
-
-
-		foreach($data as $asx_data){
-			//$asx_data = get_asx_data($instance);
-			if($asx_data->symbol == $asx_code){
-				layout($content,$asx_data);
-			}
-		}
-
-	}
-	add_shortcode('asx', 'asx_shortcode_handler');*/
 	function add_asx_style(){
 		wp_register_style('asx_stylesheet', plugins_url('/css/asx_style.css', __FILE__));
 		wp_enqueue_style('asx_stylesheet');

@@ -29,20 +29,38 @@ class Asx_Widget extends WP_Widget {
 				if ( ! empty( $instance['title'] ) ) {
 					echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ). $args['after_title'];
 				}
-				$result .= '<div class="asx-summary"><div class="quote-summary"><div class="hd"><div class="title"><h2 style="display: inline-block">';
+				$result .= '<div class="asx-summary"><div class="quote-summary"><div class="hd"><div class="title"><h3 style="display: inline-block">';
 				$result .= $asx_data->symbol;
-				$result .= "</h2>";
+				$result .= "</h3>";
 				
-				$result .= "<span><span> - </span>";
+				$result .= "<span> - ";
 				$result .= $asx_data->StockExchange;
 				$result .='</span></div></div><div class="asx-quote"><div><span class="ticker">';
 				$result .=$asx_data->LastTradePriceOnly;
+				if($asx_data->Change > 0){
+					$changecolor = 'green';
+					$changeimage = plugins_url('/images/up.gif', __FILE__);
+				} else {
+					$changecolor = 'red';
+					$changeimage = plugins_url('/images/down.gif', __FILE__);
+				}
 				$result .='</span><span class=“change">';
+				$result .='<img class="change-image" alt="up" src="';
+				$result .=$changeimage;
+				$result .='"></img><span class="change-';
+
+				$result .=$changecolor;
+				$result .='">';
 				$result .=$asx_data->Change;
-				$result .='</span><span class=“change-percent">(';
+				$result .='</span><span class="change-';
+				$result .=$changecolor;
+				$result .='">(';
 				$result .=$asx_data->ChangeinPercent;
-				$result .=')</span><span class=“trade-time">';
+				$result .=')</span></div><div><span class="trade-time">';
 				$result .=$asx_data->LastTradeTime;
+				$result .='</span><span class="time-zone">';
+				date_default_timezone_set(get_option('timezone_string'));
+				$result .=date('T');
 				$result .= "</span></div></div></div></div>";
 				echo $result;
 				echo $args['after_widget'];
