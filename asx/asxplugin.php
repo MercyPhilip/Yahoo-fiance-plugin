@@ -94,13 +94,18 @@ function asx_options() {
 			curl_setopt($session, CURLOPT_RETURNTRANSFER,true);
 			$json = curl_exec($session);
 
+			if($json === FALSE){
+				echo "Failed to connect YahooAPI". curl_error($session);
+			}
 			$dataObj =  json_decode($json);
 
 			if(!is_null($dataObj->query->results)){
 				$asx_data[$num] = $dataObj->query->results->quote;
-
 			}
-		update_option('asx_data', $asx_data);
+
+			curl_close($session);
+
+			update_option('asx_data', $asx_data);
 		}
 	}
 	
